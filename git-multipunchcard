@@ -2,6 +2,7 @@
 # Note:
 # Originally written by guanqun (https://github.com/guanqun/) Sep 29, 2011
 # Edited by Intrepid (https://github.com/intrepid/) Apr 12, 2012
+# Further edited by hyPiRion (https://github.com/hyPiRion/) Sep 24, 2015
 
 import math
 import cairo
@@ -9,26 +10,34 @@ import sys
 import subprocess
 
 # defaults
-author = ''
 width = 1100
 output_file = 'output.png'
 
 if len(sys.argv) > 1:
     if sys.argv[1] == "--help" or sys.argv[1] == "-h":
         print("SYNTAX:    git punchchard")
-        print("EXAMPLE:   git punchchard file=outputfile.png width=4000")
-        print("This creates 'outputfile.png', a 4000px wide png image")
+        print("EXAMPLE:   git punchchard file=outputfile.png width=4000 -- --author=foo")
+        print("This creates 'outputfile.png', a 4000px wide png image, where git log")
+        print("has filtered author by foo")
         print()
+        print("Extra commands to git log can be sent after entering --")
         sys.exit(0)
 
-options =dict()
+def split_at(lst, arg):
+    try:
+        pos = lst.index(arg)
+        return lst[:pos], lst[pos+1:]
+    except ValueError:
+        return lst, []
+
+options=dict()
+extra_log_args=[]
 
 if len(sys.argv) > 1:
-    options = dict(arg.split('=') for arg in sys.argv[1:])
+    args, extra_log_args = split_at(sys.argv[1:], '--')
+    options = dict(arg.split('=') for arg in args)
 if options.has_key('width'):
     width = int(options['width'])
-if options.has_key('author'):
-    author = options['author']
 if options.has_key('file'):
     output_file = options["file"]
 
@@ -57,7 +66,7 @@ def get_x_y_from_date(day, hour):
 
 def get_log_data():
     try:
-        gitcommand = ['git', 'log', '--no-merges', '--author='+author,  '--pretty=format: %aD']
+        gitcommand = ['git', 'log', '--no-merges', '--pretty=format: %aD'] + extra_log_args
         # if author != None:
         #     gitcommand.append('--author='+author)
         print(gitcommand)
