@@ -31,16 +31,16 @@ Then you're free to go!
 USAGE
 -----
 
-- `cp git-punchcard /usr/local/bin`
+- `cp git-multipunchcard /usr/local/bin` (or somewhere else on your `$PATH`)
 - make sure that `/usr/local/bin` is in your `$PATH` environment variable.
-- invoke `git punchcard`
+- invoke `git multipunchcard`
 
-If you want a different name, then simply invoke `git punchcard file=<another-name.png>`.
+If you want a different name, then simply invoke `git multipunchcard file=<another-name.png>`.
 The default width of a picture is 1100px.  If you'd like
-to have a higher resolution, you can run `git punchcard file=<another-name.png> width=<new-width>`.
+to have a higher resolution, you can run `git multipunchcard file=<another-name.png> width=<new-width>`.
 
 If you would like to filter by a particular author then do so as follows. (all parameters are available)
-`git punchcard author=<authorname>`
+`git multipunchcard -- --author=<authorname>`
 
 The image gets scaled automatically.
 
