@@ -7,6 +7,7 @@
 import math
 import cairo
 import sys
+import os
 import subprocess
 
 # defaults
@@ -18,10 +19,15 @@ if len(sys.argv) > 1:
         print("SYNTAX:    git punchchard")
         print("EXAMPLE:   git punchchard file=outputfile.png width=4000 -- --author=foo")
         print("This creates 'outputfile.png', a 4000px wide png image, where git log")
-        print("has filtered author by foo")
-        print()
-        print("Extra commands to git log can be sent after entering --")
+        print("has filtered author by 'foo'.")
+        print
+        print("Extra commands to git log can be sent after entering '--'")
         sys.exit(0)
+
+def subdirs(dir):
+    '''returns all the immediate subdirectories of dir'''
+    return [os.path.join(dir, name) for name in os.listdir(dir)
+            if os.path.isdir(os.path.join(dir, name))]
 
 def split_at(lst, arg):
     try:
@@ -64,27 +70,25 @@ def get_x_y_from_date(day, hour):
     x = left + (hour + 1) * distance
     return x, y
 
-def get_log_data():
+def get_log_data(wd):
     try:
         gitcommand = ['git', 'log', '--no-merges', '--pretty=format: %aD'] + extra_log_args
         # if author != None:
         #     gitcommand.append('--author='+author)
-        print(gitcommand)
+        print(str(gitcommand) + ' in ' + wd)
         p = subprocess.Popen(gitcommand,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+                             stderr=subprocess.PIPE,
+                             cwd=wd)
         outdata, errdata = p.communicate()
     except OSError as e:
         print('Git not installed?')
         sys.exit(-1)
-    if outdata == '':
-        print('Not a git repository?')
-        sys.exit(-1)
     return outdata
 
 # get day and hour
-temp_log = get_log_data()
+temp_log = '\n'.join(filter(None, [get_log_data(dirname) for dirname in subdirs(os.getcwd())]))
 data_log = [[x.strip().split(',')[0], x.strip().split(' ')[4].split(':')[0]] for x in temp_log.split('\n')]
 
 stats = {}
