@@ -89,6 +89,9 @@ def get_log_data(wd):
 
 # get day and hour
 temp_log = '\n'.join(filter(None, [get_log_data(dirname) for dirname in subdirs(os.getcwd())]))
+if temp_log == '':
+    print('None of the directories contain any lines - insufficient data.')
+    sys.exit(-1)
 data_log = [[x.strip().split(',')[0], x.strip().split(' ')[4].split(':')[0]] for x in temp_log.split('\n')]
 
 stats = {}
